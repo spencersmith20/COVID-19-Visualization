@@ -108,7 +108,7 @@ class FluModel(Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x,y))
 
-            infected = np.random.choice([0,1], p=[1-(.002/100), 0.002/100])
+            infected = np.random.choice([0,1], p=[1-.005, 0.005])
 
             if (infected == 1):
                 a.state = State.INFECTED
