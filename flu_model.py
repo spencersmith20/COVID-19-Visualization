@@ -96,7 +96,7 @@ class FluModel(Model):
         self.ptrans = ptrans
         self.recovery_days = recovery_days
         self.recovery_sd = recovery_sd
-        self.running = True
+        self.running = False
         self.deceased = 0
 
         for i in range(self.num_agents):
