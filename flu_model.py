@@ -14,10 +14,10 @@ class FluAgent(Agent):
         self.infection_time = 0
 
         # age (currently not used)
-        self.age = self.random.normalvariate(20, 40)
+        self.age = self.random.normalvariate(40, 20)
 
         # "base probability" of getting tested. (mean=1, st. dev=0.2)
-        self.p_test = self.random.normalvariate(1, 0.2)
+        self.p_test = self.random.normalvariate(1, 0.12)
 
     def step(self):
 
@@ -87,17 +87,20 @@ class FluAgent(Agent):
 
 class FluModel(Model):
 
-    def __init__(self, N, width=10, height=10, death_rate=0.006, ptrans = 0.6,
-                                            recovery_days=24, recovery_sd=5):
+    def __init__(self, N, width=10, height=10, death_rate=0.006, ptrans=0.5,
+                                            recovery_days=24, recovery_sd=6,
+                                            init_inf = 1.5):
         self.num_agents = N
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, True)
         self.death_rate = death_rate
         self.ptrans = ptrans
+
         self.recovery_days = recovery_days
         self.recovery_sd = recovery_sd
         self.running = False
         self.deceased = 0
+        self.init_inf = init_inf / 100
 
         for i in range(self.num_agents):
 
@@ -108,11 +111,18 @@ class FluModel(Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x,y))
 
-            infected = np.random.choice([0,1], p=[1-.005, 0.005])
+            infected = np.random.choice([0,1], p=[1-self.init_inf, self.init_inf])
 
             if (infected == 1):
                 a.state = State.INFECTED
                 a.recovery_time = self.get_recovery_time()
+
+        # if initial infection percent is very small, pick a single agent to infect
+        if (self.init_inf * self.num_agents < 1):
+            a = self.random.choice(self.schedule.agents)
+            a.state = State.INFECTED
+            a.recovery_time = self.get_recovery_time()
+
 
         self.datacollector = DataCollector(agent_reporters={"State": "state", 'p': 'p_test'})
 
