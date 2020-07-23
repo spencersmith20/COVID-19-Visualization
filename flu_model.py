@@ -4,6 +4,7 @@ from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 import numpy as np
 import enum
+import random
 
 class FluAgent(Agent):
 
@@ -88,8 +89,9 @@ class FluAgent(Agent):
 class FluModel(Model):
 
     def __init__(self, N, width=10, height=10, death_rate=0.006, ptrans=0.5,
-                                            recovery_days=24, recovery_sd=6,
-                                            init_inf = 1.5):
+                            recovery_days=24, recovery_sd=6,
+                            init_inf = 1.5, biased=False):
+
         self.num_agents = N
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, True)
@@ -122,7 +124,6 @@ class FluModel(Model):
             a = self.random.choice(self.schedule.agents)
             a.state = State.INFECTED
             a.recovery_time = self.get_recovery_time()
-
 
         self.datacollector = DataCollector(agent_reporters={"State": "state", 'p': 'p_test'})
 
