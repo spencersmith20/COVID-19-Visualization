@@ -18,7 +18,7 @@ class FluAgent(Agent):
         self.age = self.random.normalvariate(40, 20)
 
         # "base probability" of getting tested. (mean=1, st. dev=0.2)
-        self.p_test = self.random.normalvariate(1, 0.12)
+        self.p_test = self.random.normalvariate(1, 0.1)
 
     def step(self):
 
@@ -42,8 +42,9 @@ class FluAgent(Agent):
             # probability to get tested increased amount of symptoms.
             # (Approximately doubled from normal probability, with some var)
 
-            # UNCOMMENT TO CHANGE TO BIASED SAMPLING
-            # self.p_test = self.random.normalvariate(2, 0.5)
+            # BIASED
+            if self.model.biased:
+                self.p_test = self.random.normalvariate(2, 0.25)
 
             # generate random number and compare to death rate
             drate = self.model.death_rate
@@ -62,8 +63,9 @@ class FluAgent(Agent):
                 # set new state and change p of being sampled to 0.5 * original
                 self.state = State.RECOVERED
 
-                # UNCOMMENT TO CHANGE TO BIASED SAMPLING
-                #self.p_test = self.random.normalvariate(0.5, 0.08)
+                # BIASED
+                if self.model.biased:
+                    self.p_test = self.random.normalvariate(0.5, 0.05)
 
     def contact(self):
 
@@ -103,6 +105,7 @@ class FluModel(Model):
         self.running = False
         self.deceased = 0
         self.init_inf = init_inf / 100
+        self.biased = biased
 
         for i in range(self.num_agents):
 
